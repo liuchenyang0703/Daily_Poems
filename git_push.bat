@@ -1,5 +1,8 @@
 @echo off
 
+REM Retrieve daily poetry to index.html
+curl https://v1.jinrishici.com/all.txt > ./index.html
+
 REM Add files to the staging area
 git add .
 
