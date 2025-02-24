@@ -1,5 +1,7 @@
 @echo off
 
+cd C:\Users\user\Desktop\定时推送\Daily_Poems
+
 REM Retrieve daily poetry to index.html
 curl https://v1.jinrishici.com/all.txt > ./index.html
 
