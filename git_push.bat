@@ -16,4 +16,4 @@ REM Display completion message
 echo Commit completed!
 
 REM Pause to wait for user input before closing the command prompt
-pause
+REM pause
