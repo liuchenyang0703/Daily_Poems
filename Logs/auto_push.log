@@ -5,3 +5,21 @@
 [2025-03-06 14:33:20] INFO    :    → % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
 [2025-03-06 14:33:20] INFO    :    → Dload  Upload   Total   Spent    Left  Speed
 [2025-03-06 14:33:20] INFO    :    → 0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    39  100    39    0     0     39      0  0:00:01 --:--:--  0:00:01   131
+[2025-03-06 14:33:21] INFO    :    → [main 8e824d2] Daily poetry
+[2025-03-06 14:33:21] INFO    :    → 2 files changed, 8 insertions(+), 1 deletion(-)
+[2025-03-06 14:33:21] INFO    :    → create mode 100644 Logs/auto_push.log
+[2025-03-06 14:33:28] INFO    :    → To https://github.com/liuchenyang0703/Daily_Poems.git
+[2025-03-06 14:33:28] INFO    :    → c01a745..8e824d2  main -> main
+[2025-03-06 14:33:28] INFO    :    → Commit completed!
+[2025-03-06 14:33:28] INFO    : ✅ 执行成功
+[2025-03-06 14:33:29] INFO    : 📧 成功发送通知邮件
+[2025-03-06 14:33:29] INFO    : ⏳ 下次执行时间：2025-03-07 14:33:19
+[2025-03-06 14:33:29] INFO    : 💤 进入休眠状态，等待 23小时59分钟
+[2025-03-06 14:34:13] INFO    : 
+🛑 用户手动终止程序
+[2025-03-06 14:34:14] INFO    : 📁 日志文件保存在：C:\Users\user\Desktop\定时推送\Daily_Poems\Logs\auto_push.log
+[2025-03-06 14:34:14] INFO    : 🚀 守护程序启动
+[2025-03-06 14:34:14] INFO    : ⏰ 本次执行时间：2025-03-06 14:34:14
+[2025-03-06 14:34:14] INFO    : 🔄 开始执行BAT脚本...
+[2025-03-06 14:34:14] INFO    :    → % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+[2025-03-06 14:34:14] INFO    :    → Dload  Upload   Total   Spent    Left  Speed
