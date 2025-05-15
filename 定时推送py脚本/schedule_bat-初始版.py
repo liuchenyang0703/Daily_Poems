@@ -9,11 +9,10 @@ from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.header import Header
 
-
 # █████████████████████████ 用户配置区域 █████████████████████████
 BAT_DIR = r"C:\Users\user\Desktop\定时推送\Daily_Poems"  # 存放bat脚本路径
 BAT_NAME = "git_push.bat"  # 你的BAT文件名
-LOG_DIR = r"C:\Users\user\Desktop\定时推送"  # 存放日志文件的路径
+LOG_DIR = r"C:\Users\user\Desktop\定时推送" # 存放日志文件的路径
 
 # 邮件配置（需要QQ邮箱开启SMTP服务）
 EMAIL_SETTINGS = {
@@ -47,7 +46,6 @@ class ColorFormatter(logging.Formatter):
         color = self.COLORS.get(record.levelname, self.COLORS['RESET'])
         message = super().format(record)
         return f"{color}{message}{self.COLORS['RESET']}"
-
 
 def setup_logging():
     logger = logging.getLogger()
@@ -88,7 +86,6 @@ def setup_logging():
     # 显示日志路径
     logging.info(f"📁 日志文件保存在：{log_path}")
 
-
 # █████████████████████████ 时间格式转换 █████████████████████████
 def seconds_to_hms(seconds):
     """将秒数转换为小时分钟格式"""
@@ -96,9 +93,8 @@ def seconds_to_hms(seconds):
     minutes = (seconds % 3600) // 60
     return f"{int(hours)}小时{int(minutes)}分钟"
 
-
 # █████████████████████████ 发送通知邮件 █████████████████████████
-def send_email(success=True, next_run=None, error_message=None):
+def send_email(success=True, next_run=None):
     """发送结果通知邮件"""
     try:
         # 构建邮件内容
@@ -107,12 +103,10 @@ def send_email(success=True, next_run=None, error_message=None):
         <h3>Git每日自动推送执行结果通知</h3>
         <p>执行时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
         <p>执行结果：{'成功完成Git每日自动推送操作' if success else '每日自动推送过程中发生错误，请检查！'}</p>
+        {f'<p>下次执行时间：{next_run.strftime("%Y-%m-%d %H:%M:%S")}</p>' if next_run else ''}
+        <hr>
+        <small>此邮件由Liucy研发的自动推送系统发送，请勿直接回复</small>
         """
-        if error_message:
-            content += f"<p>错误信息：{error_message}</p>"
-        if next_run:
-            content += f'<p>下次执行时间：{next_run.strftime("%Y-%m-%d %H:%M:%S")}</p>'
-        content += '<hr><small>此邮件由Liucy研发的自动推送系统发送，请勿直接回复</small>'
 
         # 创建邮件对象
         msg = MIMEText(content, 'html', 'utf-8')
@@ -133,7 +127,6 @@ def send_email(success=True, next_run=None, error_message=None):
     except Exception as e:
         logging.error(f"📧 邮件发送失败: {str(e)}")
 
-
 # █████████████████████████ 编码处理模块 █████████████████████████
 def decode_with_fallback(byte_data):
     """三级解码策略：GBK → UTF-8 → Latin-1"""
@@ -146,7 +139,6 @@ def decode_with_fallback(byte_data):
     # 终极保底方案：替换错误字符
     return byte_data.decode('latin-1', errors='replace')
 
-
 # █████████████████████████ BAT执行模块 █████████████████████████
 def execute_bat():
     """执行BAT脚本并捕获输出"""
@@ -155,7 +147,7 @@ def execute_bat():
         bat_path = os.path.join(BAT_DIR, BAT_NAME)
         if not os.path.exists(bat_path):
             logging.error(f"❌ 关键错误：BAT文件不存在于 {bat_path}")
-            return False, "BAT 文件不存在"
+            return False
 
         logging.info("🔄 开始执行BAT脚本...")
         process = subprocess.Popen(
@@ -166,48 +158,32 @@ def execute_bat():
             stderr=subprocess.STDOUT
         )
 
-        # 超时时间（秒）
-        timeout = 60  # 可以根据实际情况调整
-        start_time = time.time()
-
-        outputs = []  # 保存所有输出
+        # 实时捕获输出
         while True:
-            if time.time() - start_time > timeout:
-                logging.error("❌ 执行超时，强制终止")
-                return False, "执行超时"
-
             raw_output = process.stdout.readline()
             if not raw_output and process.poll() is not None:
                 break
             if raw_output:
                 cleaned_line = decode_with_fallback(raw_output).strip()
                 logging.info(f"   → {cleaned_line}")
-                outputs.append(cleaned_line)  # 保存输出
 
         # 检查执行结果
-        if process.returncode != 0:
+        if process.returncode == 0:
+            logging.info("✅ 执行成功")
+            return True
+        else:
             logging.error(f"❌ 执行失败 (退出码: {process.returncode})")
-            return False, f"非零退出码: {process.returncode}"
-
-        # 检查输出中是否存在 git 推送失败的关键信息
-        for line in outputs:
-            if any(error in line for error in ["Failed to connect", "Connection timed out", "fatal"]):
-                logging.error("❌ 发现错误信息，执行失败")
-                return False, f"推送失败: {line}"
-
-        logging.info("✅ 执行成功")
-        return True, None
+            return False
 
     except Exception as e:
         logging.error(f"🔥 执行异常: {str(e)}", exc_info=True)
-        return False, f"执行异常: {str(e)}"
+        return False
     finally:
         if process:
             try:
                 process.kill()
             except:
                 pass
-
 
 # █████████████████████████ 主控制循环 █████████████████████████
 def main_loop():
@@ -222,17 +198,15 @@ def main_loop():
             logging.info(f"⏰ 本次执行时间：{current_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
             # 执行BAT脚本
-            success, error_message = execute_bat()
+            success = execute_bat()
 
             # 计算下次执行时间
             next_run = current_time + timedelta(seconds=86400)
             sleep_seconds = (next_run - datetime.now()).total_seconds()
 
-            # 发送邮件
+            # 发送成功通知邮件
             if success:
                 send_email(success=True, next_run=next_run)
-            else:
-                send_email(success=False, error_message=error_message)
 
             # 格式化休眠时间显示
             hms = seconds_to_hms(sleep_seconds)
@@ -245,9 +219,8 @@ def main_loop():
         logging.info("\n🛑 用户手动终止程序")
     except Exception as e:
         logging.error(f"💥 主循环异常: {str(e)}", exc_info=True)
-        send_email(success=False, error_message=f"主循环异常: {str(e)}")
+        send_email(success=False)  # 发送错误通知
         time.sleep(3600)  # 错误后休眠1小时再重试
-
 
 if __name__ == "__main__":
     # 首次运行检查
