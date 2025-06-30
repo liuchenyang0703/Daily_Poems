@@ -10,7 +10,7 @@ REM Commit changes to the local repository
 git commit -m "Daily poetry"
 
 REM Push changes to the remote repository
-git push -f https://github.com/liuchenyang0703/Daily_Poems.git
+git push https://github.com/liuchenyang0703/Daily_Poems.git
 
 REM Display completion message
 echo Commit completed!
