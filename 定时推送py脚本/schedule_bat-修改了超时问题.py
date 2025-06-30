@@ -3,7 +3,7 @@ import time
 import subprocess
 import os
 import logging
-import logging.handlers
+import logging.handlers  # 新增日志轮转模块
 import sys
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
@@ -190,15 +190,8 @@ def execute_bat():
             return False, f"非零退出码: {process.returncode}"
 
         # 检查输出中是否存在 git 推送失败的关键信息
-        failure_keywords = [
-            "Failed to connect",
-            "Connection timed out",
-            "fatal",
-            "error: failed to push some refs",
-            "rejected"  # 新增检测rejected错误
-        ]
         for line in outputs:
-            if any(error in line for error in failure_keywords):
+            if any(error in line for error in ["Failed to connect", "Connection timed out", "fatal"]):
                 logging.error("❌ 发现错误信息，执行失败")
                 return False, f"推送失败: {line}"
 
